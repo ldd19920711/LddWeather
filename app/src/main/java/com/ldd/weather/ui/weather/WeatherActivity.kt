@@ -9,10 +9,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.Placeholder
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProviders
 import com.ldd.weather.R
+import com.ldd.weather.databinding.ActivityWeatherBinding
+import com.ldd.weather.databinding.NowBinding
 import com.ldd.weather.logic.model.Weather
 import com.ldd.weather.logic.model.getSky
 import kotlinx.android.synthetic.main.activity_weather.*
@@ -28,11 +31,14 @@ class WeatherActivity : AppCompatActivity() {
         ViewModelProviders.of(this).get(WeatherViewModel::class.java)
     }
 
+    private lateinit var _binding: ActivityWeatherBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        _binding = ActivityWeatherBinding.inflate(layoutInflater)
         supportActionBar?.hide()
-
-        setContentView(R.layout.activity_weather)
+        val view = _binding.root
+        setContentView(view)
         if (viewModel.locationLng.isEmpty()) {
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
         }
@@ -50,17 +56,17 @@ class WeatherActivity : AppCompatActivity() {
                 Toast.makeText(this, "无法成功获取天气信息", Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
-            swipeRefresh.isRefreshing = false
+            _binding.swipeRefresh.isRefreshing = false
         })
-        swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
+        _binding.swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
         refreshWeather()
-        swipeRefresh.setOnRefreshListener {
+        _binding.swipeRefresh.setOnRefreshListener {
             refreshWeather()
         }
         navBtn.setOnClickListener {
-            drawerLyaout.openDrawer(GravityCompat.START)
+            _binding.drawerLayout.openDrawer(GravityCompat.START)
         }
-        drawerLyaout.addDrawerListener(object : DrawerLayout.DrawerListener {
+        _binding. drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             }
 
@@ -81,9 +87,9 @@ class WeatherActivity : AppCompatActivity() {
         })
     }
 
-     fun refreshWeather() {
+    fun refreshWeather() {
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
-        swipeRefresh.isRefreshing = true
+        _binding.swipeRefresh.isRefreshing = true
     }
 
 
